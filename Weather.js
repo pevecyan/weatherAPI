@@ -60,6 +60,7 @@ Weather.prototype = {
 		});
 	},
 	
+	/*WEATHER INFOS - CURRENTLY */
 	/*return temperature of specified location in fahrenheits*/
 	getTemperatureFahrenheit: function(){
 		return this.data.currently.temperature;
@@ -88,6 +89,17 @@ Weather.prototype = {
 	/*return wind speed of specified location in kilometers per hour*/
 	getWindSpeedKilometers: function(){
 		return Math.floor((this.getWindSpeedMiles()/0.62137)*100)/100;
+	},
+	
+	/*return date and time when data was acquired*/
+	getTime: function(){
+		return new Date(this.data.currently.time*1000).toUTCString();
+	},
+	
+	/*	return name of icon for the weather image 
+	 * 	(clear-day, clear-night, rain, snow, sleet, wind, fog, cloudy, partly-cloudy-day, or partly-cloudy-night)*/
+	getIcon: function(){
+		return this.data.currently.icon;
 	}	
 	
 	
