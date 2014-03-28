@@ -50,7 +50,6 @@ Weather.prototype = {
 		var weatherAPI="https://api.forecast.io/forecast/28f7a15e9084c4c8fc2222d23e910b49/"+this.latitude+","+this.longitude+"?callback=?";		
 		var self = this;
 		$.getJSON(weatherAPI, function (data) {
-			alert(data);
 			self.data = data;
 			if(onLoadFunction===undefined){
 				self.onLoadFunction();	
@@ -63,7 +62,7 @@ Weather.prototype = {
 	/*WEATHER INFOS - CURRENTLY */
 	/*return temperature of specified location in fahrenheits*/
 	getTemperatureFahrenheit: function(){
-		return this.data.currently.temperature;
+		return Math.floor((this.data.currently.temperature)*10)/10;
 	},
 	
 	/*return temperature of specified location in celsius*/
@@ -100,7 +99,18 @@ Weather.prototype = {
 	 * 	(clear-day, clear-night, rain, snow, sleet, wind, fog, cloudy, partly-cloudy-day, or partly-cloudy-night)*/
 	getIcon: function(){
 		return this.data.currently.icon;
-	}	
+	},
 	
+	/* return timezone, for exmaple America/New York*/
+	getTimezone: function(){
+		return this.data.timezone;
+	},
+	
+	/*DAILY WEATHER INFOS*/
+	
+	/*return time of specific day*/	
+	getDayTime: function(day){
+		return this.data.daily.data[day].time*1000;
+	}	
 	
 }
