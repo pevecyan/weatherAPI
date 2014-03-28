@@ -1,11 +1,17 @@
 /*	WEATHER
-*	constructor(<latitude>, <longitude>): 
+*	constructor(<onLoadFunction>,<latitude>, <longitude>): 
 * 		-(if at least one of latitude or longitude is not defined, geo-location is triggered)
-*
+*		-onLoadfunction is triggered when data is loaded from weather API, can be empty
 * 	varaibles
 *
 */
-function Weather(latitude, longtidue){
+function Weather(onLoadFunction, latitude, longtidue){
+	this.onLoadFunction = function (){};
+	if(!(onLoadFunction === undefined)){
+		this.onLoadFunction = onLoadFunction;	
+	}
+	
+	
 	if(latitude === undefined || longitude === undefined){
 		this.acquireLocation();
 	}else{
@@ -45,7 +51,18 @@ Weather.prototype = {
 		var self = this;
 		$.getJSON(weatherAPI, function (data) {
 			alert(data);
-			self.data = data;	
+			self.data = data;
+			self.onLoadFunction();	
 		});
+	},
+	
+	/*return temperature of specified location in fahrenheits*/
+	getTemperatureFahrenheit: function(){
+		return this.data.currently.temperature;
+	},
+	/*return temperature of specified location in celsius*/
+	getTemperatureCelsius: function(){
+		return Math.floor(((this.getTemperatureFahrenheit()-32)/1.8)*10)/10;
 	}
+	
 }

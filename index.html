@@ -6,7 +6,10 @@
 		<script>
 			var weather;
 			function onLoad(){
-				weather = new Weather();
+				weather = new Weather(weatherLoaded);
+			}
+			function weatherLoaded (){
+				alert(weather.getTemperatureCelsius());
 			}
 		</script>
 	</head>
