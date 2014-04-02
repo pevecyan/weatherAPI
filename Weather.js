@@ -2,7 +2,7 @@
 *	constructor(<onLoadFunction>,<latitude>, <longitude>): 
 * 		-(if at least one of latitude or longitude is not defined, geo-location is triggered)
 *		-onLoadfunction is triggered when data is loaded from weather API, can be empty
-* 	varaibles
+* 	
 *
 */
 var selfWeather;
@@ -12,9 +12,9 @@ function Weather(onLoadFunction, latitude, longitude){
 		this.onLoadFunction = onLoadFunction;	
 	}
 
+    /*Location object*/
 	this.location = new Location(this, latitude, longitude);
-	
-	
+
 	this.data;
 	selfWeather = this;
 }
@@ -26,15 +26,13 @@ function setData(data){
 Weather.prototype = {
 	constructor: Weather,
 	
-	/*Get geo-location from browser*/
-	
-	
 	/*Set longitude and latitude*/
 	setLocation: function (latitude, longitude){
 		this.latitude = latitude;
 		this.longitude = longitude;
 	},
 	
+    /*Set weather datat //jsonp callback function*/
 	setData: function(data){
 		this.data = data;
 		this.onLoadFunction();
@@ -42,6 +40,8 @@ Weather.prototype = {
 	
 	/*Get weather data from API over jquery getJSON function*/
 	acquireWeatherData: function (onLoadFunction) {
+
+        //Deletes old json script
 	    if (document.getElementById("weatherScript")) {
 	        var scriptTag = document.getElementById("weatherScript");
 	        document.getElementsByTagName('HEAD')[0].removeChild(scriptTag);
@@ -63,12 +63,7 @@ Weather.prototype = {
 	getTemperatureFahrenheit: function(){
 		return Math.floor((this.data.currently.temperature)*10)/10;
 	},
-	
-	/*return temperature of specified location in celsius*/
-	getTemperatureCelsius: function(){
-		return Math.floor(((this.getTemperatureFahrenheit()-32)/1.8)*10)/10;
-	},
-	
+
 	/*return pressure of specified lcoation in hPa*/
 	getPressure: function(){
 		return this.data.currently.pressure;
@@ -116,20 +111,17 @@ Weather.prototype = {
 	getDayMaxTemperatureFahrenheit: function(day){
 		return Math.floor((this.data.daily.data[day].temperatureMax)*10)/10;
 	},
-	
-	/*return maximun temperature of specific day in celsius*/
-	getDayMaxTemperatureCelsius: function(day){
-		return Math.floor(((this.getDayMaxTemperatureFahrenheit(day) - 32)/1.8)*10)/10;
-	},
-	
+
 	/*return minimun temperature of specific day in fahrenheits*/
 	getDayMinTemperatureFahrenheit: function(day){
 		return Math.floor((this.data.daily.data[day].temperatureMin)*10)/10;
 	},
-	
-	/*return minimun temperature of specific day in celsius*/	
-	getDayMinTemperatureCelsius: function(day){
-		return Math.floor(((this.getDayMinTemperatureFahrenheit(day) - 32)/1.8)*10)/10;
-	},
+
+    /*Convert and return temperature in celsius: exmaple (weather.getCelsius(weather.getTemperatureFahrenheit()))
+    input: temperature in fahrenheit*/
+	getCelsius: function (tempFahrenheit) {
+	    return Math.floor(((tempFahrenheit - 32) / 1.8) * 10) / 10;
+	}
+
 }
 

@@ -1,4 +1,7 @@
 var selfLocation;
+/*function Location(<weather>, <latitude>, <longitude>)*/
+//-(if at least one of latitude or longitude is not defined, geo-location is triggered)
+// 
 function Location(weather, latitude, longitude) {
     this.weather = weather;
     
@@ -11,9 +14,6 @@ function Location(weather, latitude, longitude) {
     
     selfLocation = this;
 
-    this.country_name = "";
-    this.region_name = "";
-    this.city = "";
 
 }
 
@@ -32,7 +32,7 @@ Location.prototype = {
             maximumAge: 0
         };
 
-
+        //try gps location
         if ("geolocation" in navigator) {
             navigator.geolocation.getCurrentPosition(function (position) {
                 navigator.geolocation.watchPosition(function (position) {
@@ -42,24 +42,27 @@ Location.prototype = {
 
                 self.setLocation(position.coords.latitude, position.coords.longitude);
             },
+            //if gps not enabled, ip tracking
             function () {
                 //alert("IP TRACKING");
                 self.acquireLocationIP();
                 self.startAcquiringLocationIP();
             });
 
-
+            //if gps not enabled, ip tracking
         } else {
             //alert("IP TRacking");
             self.acquireLocationIP();
             self.startAcquiringLocationIP();
         }
     },
+    //Get iplocation every 20 seconds
     startAcquiringLocationIP: function () {
         var self = this;
-        var interval = setInterval(function () { self.acquireLocationIP();  }, 10000);
+        var interval = setInterval(function () { self.acquireLocationIP();  }, 20000);
     },
 
+    //Get location from IP
     acquireLocationIP: function () {
         console.log("Updejtam ip lokacijo");
         var self = this;
@@ -91,15 +94,13 @@ Location.prototype = {
         document.getElementsByTagName('HEAD')[0].appendChild(scriptTag);
         */
     },
+
+    //set location from IP or GPS
     setLocation: function (latitude, longitude) {
         this.latitude = latitude;
         this.longitude = longitude;
         
         this.weather.acquireWeatherData();
     },
-    setGeolocationIPPlace: function (country_name, region_name, city) {
-        this.country_name = country_name;
-        this.region_name = region_name;
-        this.city = city;
-    },
+    
 }
