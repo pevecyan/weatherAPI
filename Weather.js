@@ -41,13 +41,20 @@ Weather.prototype = {
 	},
 	
 	/*Get weather data from API over jquery getJSON function*/
-	acquireWeatherData: function(onLoadFunction){
-		var scriptTag = document.createElement('SCRIPT');
+	acquireWeatherData: function (onLoadFunction) {
+	    if (document.getElementById("weatherScript")) {
+	        var scriptTag = document.getElementById("weatherScript");
+	        document.getElementsByTagName('HEAD')[0].removeChild(scriptTag);
+	    }
+
+	    var scriptTag = document.createElement('SCRIPT');
+	    scriptTag.id = "weatherScript";
 		scriptTag.type = "application/javascript";
 		var weatherAPI = "https://api.forecast.io/forecast/28f7a15e9084c4c8fc2222d23e910b49/" + this.location.latitude + "," + this.location.longitude + "?callback=setData";
 		 
 		scriptTag.src = weatherAPI;
 		document.getElementsByTagName('HEAD')[0].appendChild(scriptTag);
+        
 		
 	},
 	
