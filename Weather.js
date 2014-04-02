@@ -121,7 +121,17 @@ Weather.prototype = {
     input: temperature in fahrenheit*/
 	getCelsius: function (tempFahrenheit) {
 	    return Math.floor(((tempFahrenheit - 32) / 1.8) * 10) / 10;
-	}
+	},
+
+    /*Return custom value from weather api, documentation here: https://developer.forecast.io/docs/v2 */
+    /*Example <weather.getOtherValue("currently", "temperature")>*/
+	getOtherValue: function () {
+	    var value = this.data;
+	    for (var i = 0; i < arguments.length; i++) {
+	        value = value[arguments[i]];
+	    }
+        return value;
+    }
 
 }
 
