@@ -5,39 +5,29 @@
 * 	varaibles
 *
 */
-function Weather(onLoadFunction, latitude, longtidue){
+var selfWeather;
+function Weather(onLoadFunction, latitude, longitude){
 	this.onLoadFunction = function (){};
 	if(!(onLoadFunction === undefined)){
 		this.onLoadFunction = onLoadFunction;	
 	}
+
+	this.location = new Location(this, latitude, longitude);
 	
-	
-	if(latitude === undefined || longitude === undefined){
-		this.acquireLocation();
-	}else{
-		this.latitude = latitude;
-		this.longitude = longitude;
-	}
 	
 	this.data;
-	
+	selfWeather = this;
+}
+
+function setData(data){
+	selfWeather.setData(data);
 }
 
 Weather.prototype = {
 	constructor: Weather,
 	
 	/*Get geo-location from browser*/
-	acquireLocation: function(){
-		var self = this;
-		if (navigator.geolocation) {
-		    navigator.geolocation.getCurrentPosition(function (position) {
-		        self.setLocation(position.coords.latitude, position.coords.longitude);
-		        self.acquireWeatherData();
-		    });
-		} else {
-		    alert("Location cannot be acquired");
-	   	}
-	},
+	
 	
 	/*Set longitude and latitude*/
 	setLocation: function (latitude, longitude){
@@ -45,18 +35,20 @@ Weather.prototype = {
 		this.longitude = longitude;
 	},
 	
+	setData: function(data){
+		this.data = data;
+		this.onLoadFunction();
+	},
+	
 	/*Get weather data from API over jquery getJSON function*/
 	acquireWeatherData: function(onLoadFunction){
-		var weatherAPI="https://api.forecast.io/forecast/28f7a15e9084c4c8fc2222d23e910b49/"+this.latitude+","+this.longitude+"?callback=?";		
-		var self = this;
-		$.getJSON(weatherAPI, function (data) {
-			self.data = data;
-			if(onLoadFunction===undefined){
-				self.onLoadFunction();	
-			}else{
-				onLoadFunction();
-			}
-		});
+		var scriptTag = document.createElement('SCRIPT');
+		scriptTag.type = "application/javascript";
+		var weatherAPI = "https://api.forecast.io/forecast/28f7a15e9084c4c8fc2222d23e910b49/" + this.location.latitude + "," + this.location.longitude + "?callback=setData";
+		 
+		scriptTag.src = weatherAPI;
+		document.getElementsByTagName('HEAD')[0].appendChild(scriptTag);
+		
 	},
 	
 	/*WEATHER INFOS - CURRENTLY */
@@ -111,6 +103,26 @@ Weather.prototype = {
 	/*return time of specific day*/	
 	getDayTime: function(day){
 		return this.data.daily.data[day].time*1000;
-	}	
+	},
 	
+	/*return maximun temperature of specific day in fahrenheits*/
+	getDayMaxTemperatureFahrenheit: function(day){
+		return Math.floor((this.data.daily.data[day].temperatureMax)*10)/10;
+	},
+	
+	/*return maximun temperature of specific day in celsius*/
+	getDayMaxTemperatureCelsius: function(day){
+		return Math.floor(((this.getDayMaxTemperatureFahrenheit(day) - 32)/1.8)*10)/10;
+	},
+	
+	/*return minimun temperature of specific day in fahrenheits*/
+	getDayMinTemperatureFahrenheit: function(day){
+		return Math.floor((this.data.daily.data[day].temperatureMin)*10)/10;
+	},
+	
+	/*return minimun temperature of specific day in celsius*/	
+	getDayMinTemperatureCelsius: function(day){
+		return Math.floor(((this.getDayMinTemperatureFahrenheit(day) - 32)/1.8)*10)/10;
+	},
 }
+
