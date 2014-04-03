@@ -1,18 +1,21 @@
+/*  LOCATION
+*   constructor Location(<weather>, <latitude>, <longitude>)
+*       <weather> weather object
+*       <updateTime> time in seconds of interval when location will be updated and weather acquired (if -1 autoupdate disabled)
+*       <latitude><longitude> (if at least one of latitude or longitude is not defined, geo-location is triggered)
+*/
 var selfLocation;
-/*function Location(<weather>, <latitude>, <longitude>)*/
-//<weather> weather object
-//<updateTime> time in seconds of interval when location will be updated and weather acquired (if -1 autoupdate disabled)
-//-(if at least one of latitude or longitude is not defined, geo-location is triggered)
-// 
 function Location(weather,updateTime, latitude, longitude) {
     this.weather = weather;
 
+    //Setting update time
     if (updateTime === undefined) {
         this.updateTime = 20000;
     }else{
         this.updateTime = updateTime;
     }
 
+    //Setting latitude and longitude, if not in arguments start acquiring
     if (latitude === undefined || longitude === undefined) {
         this.startAcquiringLocation();
     } else {
@@ -35,35 +38,22 @@ Location.prototype = {
 
         var self = this;
 
-        //GPS WatchPosition options
-        options = {
-            enableHighAccuracy: false,
-            timeout: 20000,
-            maximumAge: 0
-        };
-
         //try gps location
         if ("geolocation" in navigator) {
             navigator.geolocation.getCurrentPosition(function (position) {
                 self.setLocation(position.coords.latitude, position.coords.longitude);  
             },
-
             //if gps not enabled, ip tracking
             function () {
-                //alert("IP TRACKING");
                 self.acquireLocationIP();
-                
             });
-
             //if gps not enabled, ip tracking
         } else {
-            //alert("IP TRacking");
             self.acquireLocationIP();
-            
         }
     },
     
-    //Get location every 20 seconds
+    //Get location every <this.updateTime> seconds
     startAcquiringLocation: function () {
         var self = this;
         this.acquireLocation();
@@ -76,6 +66,7 @@ Location.prototype = {
     acquireLocationIP: function () {
         console.log("Updejtam ip lokacijo");
         var self = this;
+
         //ajax ip location call
         var xmlhttp;
         if (window.XMLHttpRequest) {// code for IE7+, Firefox, Chrome, Opera, Safari
@@ -94,23 +85,13 @@ Location.prototype = {
         xmlhttp.open("GET", "http://freegeoip.net/json/", true);
         xmlhttp.send();
 
-
-        /*
-        var scriptTag = document.createElement('SCRIPT');
-        scriptTag.type = "application/javascript";
-        var weatherAPI = "http://freegeoip.net/json/"+ "?callback=setLocationIP";
-
-        scriptTag.src = weatherAPI;
-        document.getElementsByTagName('HEAD')[0].appendChild(scriptTag);
-        */
     },
 
-    //set location from IP or GPS to this object
+    //set latitude and longitude from IP or GPS
     setLocation: function (latitude, longitude) {
         this.latitude = latitude;
         this.longitude = longitude;
         
         this.weather.acquireWeatherData();
     },
-    
 }

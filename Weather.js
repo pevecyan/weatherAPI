@@ -1,10 +1,8 @@
 /*	WEATHER
 *	constructor(<onLoadFunction>,<updateTime>, <latitude>, <longitude>): 
-*		-onLoadfunction is triggered when data is loaded from weather API, can be empty
-        <updateTime> time in seconds of interval when location will be updated and weather acquired (if -1 autoupdate disabled) 
-* 		-(if at least one of latitude or longitude is not defined, geo-location is triggered)
-* 	
-*
+*		<onLoadfunction>function, triggered when data is loaded from weather API, can be empty
+*       <updateTime> time in seconds of interval when location will be updated and weather acquired (if -1 autoupdate disabled) 
+* 		<latitude> <longtidue>(if at least one of latitude or longitude is not defined, geo-location is triggered)
 */
 var selfWeather;
 function Weather(onLoadFunction,updateTime, latitude, longitude){
@@ -20,6 +18,7 @@ function Weather(onLoadFunction,updateTime, latitude, longitude){
 	selfWeather = this;
 }
 
+/*Set weather data*/
 function setData(data){
 	selfWeather.setData(data);
 }
@@ -39,8 +38,8 @@ Weather.prototype = {
 		this.onLoadFunction();
 	},
 	
-	/*Get weather data from API over jquery getJSON function*/
-	acquireWeatherData: function (onLoadFunction) {
+	/*Get weather data from API with jsonp*/
+	acquireWeatherData: function () {
 
         //Deletes old json script
 	    if (document.getElementById("weatherScript")) {
@@ -51,7 +50,7 @@ Weather.prototype = {
 	    var scriptTag = document.createElement('SCRIPT');
 	    scriptTag.id = "weatherScript";
 		scriptTag.type = "application/javascript";
-		var weatherAPI = "https://api.forecast.io/forecast/28f7a15e9084c4c8fc2222d23e910b49/" + this.location.latitude + "," + this.location.longitude + "?callback=setData&exclude=flags,hourly";
+		var weatherAPI = "https://api.forecast.io/forecast/28f7a15e9084c4c8fc2222d23e910b49/" + this.location.latitude + "," + this.location.longitude + "?callback=setData&exclude=hourly flags";
 		 
 		scriptTag.src = weatherAPI;
 		document.getElementsByTagName('HEAD')[0].appendChild(scriptTag);
@@ -59,6 +58,7 @@ Weather.prototype = {
 		
 	},
 	
+
 	/*WEATHER INFOS - CURRENTLY */
 	/*return temperature of specified location in fahrenheits*/
 	getTemperatureFahrenheit: function(){
@@ -101,8 +101,10 @@ Weather.prototype = {
 		return this.data.timezone;
 	},
 	
+
 	/*DAILY WEATHER INFOS*/
-	
+	//<day> 0 - 7 (0 today, 1 tomorrow, ...)
+
 	/*return time of specific day*/	
 	getDayTime: function(day){
 		return this.data.daily.data[day].time*1000;
@@ -118,14 +120,14 @@ Weather.prototype = {
 		return Math.floor((this.data.daily.data[day].temperatureMin)*10)/10;
 	},
 
-    /*Convert and return temperature in celsius: exmaple (weather.getCelsius(weather.getTemperatureFahrenheit()))
+    /*OTHER*/
+    /*Convert and return temperature in celsius: example (weather.getCelsius(weather.getTemperatureFahrenheit()))
     input: temperature in fahrenheit*/
 	getCelsius: function (tempFahrenheit) {
 	    return Math.floor(((tempFahrenheit - 32) / 1.8) * 10) / 10;
 	},
 
-    /*OTHER*/
-    /*Return custom value from weather api, documentation here: https://developer.forecast.io/docs/v2 */
+    /*Return custom value from weather api, documentation here: https://developer.forecast.io/docs/v2 (FLAGS AND HOURLY are disabled, for data saving*/
     /*Example <weather.getOtherValue("currently", "temperature")>*/
 	getOtherValue: function () {
 	    var value = this.data;
