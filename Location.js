@@ -1,18 +1,29 @@
 var selfLocation;
 /*function Location(<weather>, <latitude>, <longitude>)*/
+//<weather> weather object
+//<updateTime> time in seconds of interval when location will be updated and weather acquired
 //-(if at least one of latitude or longitude is not defined, geo-location is triggered)
 // 
-function Location(weather, latitude, longitude) {
+function Location(weather,updateTime, latitude, longitude) {
     this.weather = weather;
-    
+
+    if (updateTime === undefined) {
+        this.updateTime = 20000;
+    }else{
+        this.updateTime = updateTime * 1000;
+    }
+
     if (latitude === undefined || longitude === undefined) {
-        this.acquireLocation();
+        this.startAcquiringLocation();
     } else {
         this.latitude = latitude;
         this.longitude = longitude;
     }
+
     
+
     selfLocation = this;
+    
 }
 
 Location.prototype = {
@@ -20,44 +31,43 @@ Location.prototype = {
 
     //Get geolocation from GPS or IP
     acquireLocation: function () {
-        
+        console.log("updejtam poziicjo");
+
         var self = this;
 
         //GPS WatchPosition options
         options = {
             enableHighAccuracy: false,
-            timeout: 5000,
+            timeout: 20000,
             maximumAge: 0
         };
 
         //try gps location
         if ("geolocation" in navigator) {
             navigator.geolocation.getCurrentPosition(function (position) {
-                navigator.geolocation.watchPosition(function (position) {
-                    self.setLocation(position.coords.latitude, position.coords.longitude);
-                    console.log("Spreminjam poziicjo");
-                }, function () { }, options);
-
-                self.setLocation(position.coords.latitude, position.coords.longitude);
+                self.setLocation(position.coords.latitude, position.coords.longitude);  
             },
+
             //if gps not enabled, ip tracking
             function () {
                 //alert("IP TRACKING");
                 self.acquireLocationIP();
-                self.startAcquiringLocationIP();
+                
             });
 
             //if gps not enabled, ip tracking
         } else {
             //alert("IP TRacking");
             self.acquireLocationIP();
-            self.startAcquiringLocationIP();
+            
         }
     },
-    //Get iplocation every 20 seconds
-    startAcquiringLocationIP: function () {
+    
+    //Get location every 20 seconds
+    startAcquiringLocation: function () {
         var self = this;
-        var interval = setInterval(function () { self.acquireLocationIP();  }, 20000);
+        this.acquireLocation();
+        var interval = setInterval(function () { self.acquireLocation();  }, self.updateTime);
     },
 
     //Get location from IP

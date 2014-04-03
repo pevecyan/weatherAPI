@@ -1,19 +1,20 @@
 /*	WEATHER
-*	constructor(<onLoadFunction>,<latitude>, <longitude>): 
-* 		-(if at least one of latitude or longitude is not defined, geo-location is triggered)
+*	constructor(<onLoadFunction>,<updateTime>, <latitude>, <longitude>): 
 *		-onLoadfunction is triggered when data is loaded from weather API, can be empty
+        <updateTime> time in seconds of interval when location will be updated and weather acquired 
+* 		-(if at least one of latitude or longitude is not defined, geo-location is triggered)
 * 	
 *
 */
 var selfWeather;
-function Weather(onLoadFunction, latitude, longitude){
+function Weather(onLoadFunction,updateTime, latitude, longitude){
 	this.onLoadFunction = function (){};
 	if(!(onLoadFunction === undefined)){
 		this.onLoadFunction = onLoadFunction;	
 	}
 
     /*Location object*/
-	this.location = new Location(this, latitude, longitude);
+	this.location = new Location(this,updateTime, latitude, longitude);
 
 	this.data;
 	selfWeather = this;
