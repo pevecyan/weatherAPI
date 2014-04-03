@@ -1,7 +1,7 @@
 /*	WEATHER
 *	constructor(<onLoadFunction>,<updateTime>, <latitude>, <longitude>): 
 *		-onLoadfunction is triggered when data is loaded from weather API, can be empty
-        <updateTime> time in seconds of interval when location will be updated and weather acquired 
+        <updateTime> time in seconds of interval when location will be updated and weather acquired (if -1 autoupdate disabled) 
 * 		-(if at least one of latitude or longitude is not defined, geo-location is triggered)
 * 	
 *

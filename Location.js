@@ -1,7 +1,7 @@
 var selfLocation;
 /*function Location(<weather>, <latitude>, <longitude>)*/
 //<weather> weather object
-//<updateTime> time in seconds of interval when location will be updated and weather acquired
+//<updateTime> time in seconds of interval when location will be updated and weather acquired (if -1 autoupdate disabled)
 //-(if at least one of latitude or longitude is not defined, geo-location is triggered)
 // 
 function Location(weather,updateTime, latitude, longitude) {
@@ -10,7 +10,7 @@ function Location(weather,updateTime, latitude, longitude) {
     if (updateTime === undefined) {
         this.updateTime = 20000;
     }else{
-        this.updateTime = updateTime * 1000;
+        this.updateTime = updateTime;
     }
 
     if (latitude === undefined || longitude === undefined) {
@@ -67,7 +67,9 @@ Location.prototype = {
     startAcquiringLocation: function () {
         var self = this;
         this.acquireLocation();
-        var interval = setInterval(function () { self.acquireLocation();  }, self.updateTime);
+        if (self.updateTime != -1) {
+            var interval = setInterval(function () { self.acquireLocation(); }, self.updateTime*1000);
+        }
     },
 
     //Get location from IP
