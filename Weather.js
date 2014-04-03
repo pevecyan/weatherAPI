@@ -50,7 +50,7 @@ Weather.prototype = {
 	    var scriptTag = document.createElement('SCRIPT');
 	    scriptTag.id = "weatherScript";
 		scriptTag.type = "application/javascript";
-		var weatherAPI = "https://api.forecast.io/forecast/28f7a15e9084c4c8fc2222d23e910b49/" + this.location.latitude + "," + this.location.longitude + "?callback=setData";
+		var weatherAPI = "https://api.forecast.io/forecast/28f7a15e9084c4c8fc2222d23e910b49/" + this.location.latitude + "," + this.location.longitude + "?callback=setData&exclude=flags,hourly";
 		 
 		scriptTag.src = weatherAPI;
 		document.getElementsByTagName('HEAD')[0].appendChild(scriptTag);
@@ -123,6 +123,7 @@ Weather.prototype = {
 	    return Math.floor(((tempFahrenheit - 32) / 1.8) * 10) / 10;
 	},
 
+    /*OTHER*/
     /*Return custom value from weather api, documentation here: https://developer.forecast.io/docs/v2 */
     /*Example <weather.getOtherValue("currently", "temperature")>*/
 	getOtherValue: function () {
@@ -134,4 +135,3 @@ Weather.prototype = {
     }
 
 }
-

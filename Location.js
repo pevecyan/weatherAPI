@@ -13,8 +13,6 @@ function Location(weather, latitude, longitude) {
     }
     
     selfLocation = this;
-
-
 }
 
 Location.prototype = {
@@ -95,7 +93,7 @@ Location.prototype = {
         */
     },
 
-    //set location from IP or GPS
+    //set location from IP or GPS to this object
     setLocation: function (latitude, longitude) {
         this.latitude = latitude;
         this.longitude = longitude;
