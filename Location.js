@@ -16,6 +16,8 @@ function Location(weather,updateTime, latitude, longitude) {
 
     //Setting latitude and longitude, if not in arguments start acquiring
     if (latitude === undefined || longitude === undefined) {
+        this.latitude = 0;
+        this.longitude = 0;
         this.acquireLocation();
     } else {
         this.latitude = latitude;
@@ -23,16 +25,27 @@ function Location(weather,updateTime, latitude, longitude) {
     }
 
     this.city;
-    
+
+    this.activeWatchLocationID = -1; //ID of active geolocation.watchPostion function
+    this.timeOfLastLocation = new Date(); // time of last location update
+
+    setInterval(function () { this.checkIfTimePassed() }.bind(this), 1000 * 5); //interval to check if enough time passed to update weather and location
 }
 
 Location.prototype = {
     constructor: Location,
 
+    //Check if enough time passed since last update, to reupdate it and get new weather info
+    checkIfTimePassed: function (){
+        //console.log("t" + (new Date().getTime() / 1000 / 60 - this.timeOfLastLocation.getTime() / 1000 / 60));
+        this.acquireLocation();
+    },
+
     //Get geolocation from GPS or IP
     acquireLocation: function () {
         console.log("updejtam poziicjo");
-
+        
+        
         //GPS WatchPosition options
         options = {
             enableHighAccuracy: false,
@@ -40,43 +53,25 @@ Location.prototype = {
             maximumAge: 0
         };
 
-
         //try gps location
         if ("geolocation" in navigator) {
             navigator.geolocation.getCurrentPosition(
-                function (position) { this.setLocation(position.coords.latitude, position.coords.longitude); }.bind(this),
-                //if gps not enabled, ip tracking
-                function () { this.acquireLocationIP(); }.bind(this));
-
-            //WatchPosition, triggers on every location change
-            navigator.geolocation.watchPosition(
                 function (position) {
-                    //on success
-                    alert("yaay");
-                    var newLatitude = position.coords.latitude * (Math.PI / 180);;
-                    var newLongitude = position.coords.longitude * (Math.PI / 180);;
-
-                    var oldLatitude = this.latitude * (Math.PI / 180);;
-                    var oldLongitude = this.longitude * (Math.PI / 180);;
-                    //calculate distance between new and old location
-
-                    var distance = Math.acos(Math.sin(newLatitude) * Math.sin(oldLatitude) +
-                        Math.cos(newLatitude) * Math.cos(oldLatitude) * Math.cos(newLongitude - oldLongitude)) * 6375;
-
-                    distance = Math.floor(distance * 1000000)/1000;
-                    if (distance == NaN) distance = 0;
-
-                    //alert(distance);
-                    //if distance equal/more than 1000m, update location and weather
-                    if (distance >= 1000) {
+                    if ((new Date().getTime() / 1000 / 60 - this.timeOfLastLocation.getTime() / 1000 / 60) > 30) {
                         this.setLocation(position.coords.latitude, position.coords.longitude);
+                    } else { 
+                        if (this.isNewUpdateRequired(position.coords.latitude, position.coords.longitude)) {
+                            this.setLocation(position.coords.latitude, position.coords.longitude);
+                            console.log("NEW LOCATION; BECAUSE TO FAR AWAY");
+                        }
                     }
-                    //$destination = acos(sin($destination_lat)*sin($origin_lat)+cos($destination_lat)*cos($origin_lat)*cos($destination_lon - $origin_lon))*6375;
                 }.bind(this),
+                //if gps not enabled, ip tracking
                 function () {
-                    //on error
-                }.bind(this), options);
+                    this.acquireLocationIP();
+                }.bind(this));
 
+            
             
 
 
@@ -111,7 +106,9 @@ Location.prototype = {
             if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
                 var data = JSON.parse(xmlhttp.responseText);
                 //alert(data);
-                this.setLocation(data.latitude, data.longitude);
+                if (this.isNewUpdateRequired(data.latitude, data.longitude)) {
+                    this.setLocation(data.latitude, data.longitude);
+                }
             }
         }.bind(this);
         xmlhttp.open("GET", "http://freegeoip.net/json/", true);
@@ -122,7 +119,8 @@ Location.prototype = {
     setLocation: function (latitude, longitude) {
         this.latitude = latitude;
         this.longitude = longitude;
-        
+
+        this.timeOfLastLocation = new Date();//Save time when location was set
         this.getLocationName();
     },
 
@@ -149,5 +147,31 @@ Location.prototype = {
         xmlhttp.send();
         
        
+    },
+
+    //return true if distance between old and new location is more than 1000 meters or else
+    isNewUpdateRequired: function (latitude, longitude) {
+        var newLatitude = latitude * (Math.PI / 180);;
+        var newLongitude = longitude * (Math.PI / 180);;
+
+        var oldLatitude = this.latitude * (Math.PI / 180);;
+        var oldLongitude = this.longitude * (Math.PI / 180);;
+        //calculate distance between new and old location
+
+        var distance = Math.acos(Math.sin(newLatitude) * Math.sin(oldLatitude) +
+            Math.cos(newLatitude) * Math.cos(oldLatitude) * Math.cos(newLongitude - oldLongitude)) * 6375;
+
+        distance = Math.floor(distance * 1000000) / 1000;
+        if (distance == NaN) distance = 0;
+
+        //alert(distance);
+        //if distance equal/more than 1000m, update location and weather
+        if (distance >= 1000) {
+            //this.setLocation(position.coords.latitude, position.coords.longitude);
+            return true;
+            console.log("NEW LOCATION; BECAUSE TO FAR AWAY");
+        } else {
+            return false;
+        }
     }
 }
