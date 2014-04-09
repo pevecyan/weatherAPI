@@ -4,7 +4,6 @@
 *       <updateTime> time in seconds of interval when location will be updated and weather acquired (if -1 autoupdate disabled)
 *       <latitude><longitude> (if at least one of latitude or longitude is not defined, geo-location is triggered)
 */
-var selfLocation;
 function Location(weather,updateTime, latitude, longitude) {
     this.weather = weather;
 
@@ -17,15 +16,13 @@ function Location(weather,updateTime, latitude, longitude) {
 
     //Setting latitude and longitude, if not in arguments start acquiring
     if (latitude === undefined || longitude === undefined) {
-        this.startAcquiringLocation();
+        this.acquireLocation();
     } else {
         this.latitude = latitude;
         this.longitude = longitude;
     }
 
-    
-
-    selfLocation = this;
+    this.city;
     
 }
 
@@ -36,20 +33,23 @@ Location.prototype = {
     acquireLocation: function () {
         console.log("updejtam poziicjo");
 
-        var self = this;
+        //GPS WatchPosition options
+        options = {
+            enableHighAccuracy: false,
+            timeout: 5000,
+            maximumAge: 0
+        };
+
 
         //try gps location
         if ("geolocation" in navigator) {
-            navigator.geolocation.getCurrentPosition(function (position) {
-                self.setLocation(position.coords.latitude, position.coords.longitude);  
-            },
+            navigator.geolocation.getCurrentPosition(
+                function (position) { this.setLocation(position.coords.latitude, position.coords.longitude); }.bind(this),
             //if gps not enabled, ip tracking
-            function () {
-                self.acquireLocationIP();
-            });
+            function () {this.acquireLocationIP();}.bind(this));
             //if gps not enabled, ip tracking
         } else {
-            self.acquireLocationIP();
+            this.acquireLocationIP();
         }
     },
     
@@ -65,7 +65,6 @@ Location.prototype = {
     //Get location from IP
     acquireLocationIP: function () {
         console.log("Updejtam ip lokacijo");
-        var self = this;
 
         //ajax ip location call
         var xmlhttp;
@@ -79,12 +78,11 @@ Location.prototype = {
             if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
                 var data = JSON.parse(xmlhttp.responseText);
                 //alert(data);
-                self.setLocation(data.latitude, data.longitude);
+                this.setLocation(data.latitude, data.longitude);
             }
-        }
+        }.bind(this);
         xmlhttp.open("GET", "http://freegeoip.net/json/", true);
         xmlhttp.send();
-
     },
 
     //set latitude and longitude from IP or GPS
@@ -92,6 +90,31 @@ Location.prototype = {
         this.latitude = latitude;
         this.longitude = longitude;
         
-        this.weather.acquireWeatherData();
+        this.getLocationName();
     },
+
+    //get name of acquired location
+    getLocationName: function () {
+        var xmlhttp;
+        if (window.XMLHttpRequest) {// code for IE7+, Firefox, Chrome, Opera, Safari
+            xmlhttp = new XMLHttpRequest();
+        }
+        else {// code for IE6, IE5
+            xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+        }
+        xmlhttp.onreadystatechange = function () {
+            if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                var data = JSON.parse(xmlhttp.responseText);
+                //alert(data);
+                this.city = data.geonames[0].adminName1;
+                this.weather.acquireWeatherData();
+            } else if (xmlhttp.status == 404) {
+                this.weather.acquireWeatherData();
+            }
+        }.bind(this);
+        xmlhttp.open("GET", "http://api.geonames.org/findNearbyPlaceNameJSON?lat="+this.latitude+"&lng="+this.longitude+"&username=pevecyan", true);
+        xmlhttp.send();
+        
+       
+    }
 }

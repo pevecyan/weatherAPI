@@ -1,19 +1,56 @@
 <html>
 	<head>
 		<title>Weather</title>
+        <meta name="viewport" content="user-scalable=no, initial-scale=1.0, maximum-scale=1.0, width=device-width">
+		<link rel="stylesheet" type="text/css" href="main.css" />
 		<script type="text/javascript" src="Weather.js"></script>
-		<script src="//code.jquery.com/jquery-1.10.2.js"></script>
-		<script>
-			var weather;
-			function onLoad(){
-				weather = new Weather(weatherLoaded);
-			}
-			function weatherLoaded (){
-				alert(weather.getWindSpeedKilometers());
-			}
-		</script>
+        <script type="text/javascript" src="Location.js"></script>
+		<script type="text/javascript" src="index.js"></script>
 	</head>
 	<body onload="onLoad()">
-		
+        <div class="backgroundUp">
+            <div class="widgetContainer">
+                <div class="WeatherLocation">
+                    <div class="WeatherLocationMark"></div>
+                    <div id="WeatherTitle" class="WeatherLocationTitle">
+                        LOADING
+                    </div>
+                </div>
+                <div class="topLine">
+                    <div id="dayTitle" class="dayTitle">Now</div>
+                    <a class="noLink" onclick="changeFormat()">
+                        <div id="switchFormat" class="switchFormat" onmouseover="switchFormatFocus(this)" onmouseout="switchFormatUnFocus(this)"></div>
+                    </a>
+                </div>
+                <div id="weatherIcon" class="WeatherIcon"></div>
+                <div id="temperature" class="temperature"></div>
+                <div class="forecast">
+                    <a class="noLink">
+                        <div id="day1" class="day" onmouseover="dayFocus(this)" onmouseout="dayUnFocus(this)" onclick="changeDay(1)">
+
+                        </div>
+                    </a>
+                    <a class="noLink">
+                        <div id="day2" class="day" onmouseover="dayFocus(this)" onmouseout="dayUnFocus(this)" onclick="changeDay(2)">
+
+                        </div>
+                    </a>
+                    <a class="noLink">
+                        <div id="day3" class="day" onmouseover="dayFocus(this)" onmouseout="dayUnFocus(this)" onclick="changeDay(3)">
+
+                        </div>
+                    </a>
+                    <a class="noLink">
+                        <div id="day4" class="day" onmouseover="dayFocus(this)" onmouseout="dayUnFocus(this)" onclick="changeDay(4)">
+
+                        </div>
+                    </a>
+
+                </div>
+            </div>
+            <div class="widgetReflection">
+
+            </div>
+        </div>
 	</body>
 </html>

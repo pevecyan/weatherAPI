@@ -34,30 +34,19 @@ Weather.prototype = {
 	
     /*Set weather datat //jsonp callback function*/
 	setData: function(data){
-		this.data = data;
+	    this.data = data;
+	    if (this.location.city === undefined) {
+	        this.location.city = this.getTimezone();
+	    }
 		this.onLoadFunction();
 	},
 	
 	/*Get weather data from API with jsonp*/
 	acquireWeatherData: function () {
-
-        //Deletes old json script
-	    if (document.getElementById("weatherScript")) {
-	        var scriptTag = document.getElementById("weatherScript");
-	        document.getElementsByTagName('HEAD')[0].removeChild(scriptTag);
-	    }
-
-	    var scriptTag = document.createElement('SCRIPT');
-	    scriptTag.id = "weatherScript";
-		scriptTag.type = "application/javascript";
-		var weatherAPI = "https://api.forecast.io/forecast/28f7a15e9084c4c8fc2222d23e910b49/" + this.location.latitude + "," + this.location.longitude + "?callback=setData&exclude=hourly flags";
-		 
-		scriptTag.src = weatherAPI;
-		document.getElementsByTagName('HEAD')[0].appendChild(scriptTag);
-        
-		
+	    var uri = "https://api.forecast.io/forecast/28f7a15e9084c4c8fc2222d23e910b49/" + this.location.latitude + "," + this.location.longitude + "?callback=setData&exclude=hourly flags";
+	    callJSONP(uri, "weatherScript");
 	},
-	
+
 
 	/*WEATHER INFOS - CURRENTLY */
 	/*return temperature of specified location in fahrenheits*/
@@ -65,7 +54,7 @@ Weather.prototype = {
 		return Math.floor((this.data.currently.temperature)*10)/10;
 	},
 
-	/*return pressure of specified lcoation in hPa*/
+	/*return pressure of specified location in hPa - milibars*/
 	getPressure: function(){
 		return this.data.currently.pressure;
 	},
@@ -120,6 +109,10 @@ Weather.prototype = {
 		return Math.floor((this.data.daily.data[day].temperatureMin)*10)/10;
 	},
 
+	getDayIcon: function(day){
+	    return this.data.daily.data[day].icon;
+	},
+
     /*OTHER*/
     /*Convert and return temperature in celsius: example (weather.getCelsius(weather.getTemperatureFahrenheit()))
     input: temperature in fahrenheit*/
@@ -137,4 +130,21 @@ Weather.prototype = {
         return value;
     }
 
+}
+
+//call jsonp request
+function callJSONP(uri, scriptId) {
+
+    //If already set, reload
+    if (document.getElementById(scriptId)) {
+        var scriptTag = document.getElementById(scriptId);
+        document.getElementsByTagName('HEAD')[0].removeChild(scriptTag);
+    }
+
+    var scriptTag = document.createElement('SCRIPT');
+    scriptTag.id = scriptId;
+    scriptTag.type = "application/javascript";
+    var weatherAPI = uri;
+    scriptTag.src = weatherAPI;
+    document.getElementsByTagName('HEAD')[0].appendChild(scriptTag);
 }
