@@ -45,8 +45,41 @@ Location.prototype = {
         if ("geolocation" in navigator) {
             navigator.geolocation.getCurrentPosition(
                 function (position) { this.setLocation(position.coords.latitude, position.coords.longitude); }.bind(this),
-            //if gps not enabled, ip tracking
-            function () {this.acquireLocationIP();}.bind(this));
+                //if gps not enabled, ip tracking
+                function () { this.acquireLocationIP(); }.bind(this));
+
+            //WatchPosition, triggers on every location change
+            navigator.geolocation.watchPosition(
+                function (position) {
+                    //on success
+                    alert("yaay");
+                    var newLatitude = position.coords.latitude * (Math.PI / 180);;
+                    var newLongitude = position.coords.longitude * (Math.PI / 180);;
+
+                    var oldLatitude = this.latitude * (Math.PI / 180);;
+                    var oldLongitude = this.longitude * (Math.PI / 180);;
+                    //calculate distance between new and old location
+
+                    var distance = Math.acos(Math.sin(newLatitude) * Math.sin(oldLatitude) +
+                        Math.cos(newLatitude) * Math.cos(oldLatitude) * Math.cos(newLongitude - oldLongitude)) * 6375;
+
+                    distance = Math.floor(distance * 1000000)/1000;
+                    if (distance == NaN) distance = 0;
+
+                    //alert(distance);
+                    //if distance equal/more than 1000m, update location and weather
+                    if (distance >= 1000) {
+                        this.setLocation(position.coords.latitude, position.coords.longitude);
+                    }
+                    //$destination = acos(sin($destination_lat)*sin($origin_lat)+cos($destination_lat)*cos($origin_lat)*cos($destination_lon - $origin_lon))*6375;
+                }.bind(this),
+                function () {
+                    //on error
+                }.bind(this), options);
+
+            
+
+
             //if gps not enabled, ip tracking
         } else {
             this.acquireLocationIP();
