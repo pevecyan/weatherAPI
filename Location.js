@@ -41,7 +41,7 @@ function Location(weather, latitude, longitude) {
     }
 
 
-    setInterval(function () { this.updateLocation }.bind(this), 1000 * 10); //interval to check if enough time passed to update weather and location
+    setInterval(function () { this.updateLocation(); }.bind(this), 1000 * 10); //interval to check if enough time passed to update weather and location
 }
 
 /**
@@ -63,21 +63,15 @@ Location.prototype = {
      */
     acquireLocation: function () {
         //console.log("updejtam poziicjo");
-        
-        
-        //GPS WatchPosition options
-        options = {
-            enableHighAccuracy: false,
-            timeout: 5000,
-            maximumAge: 0
-        };
 
         //try gps location
         if ("geolocation" in navigator) {
             navigator.geolocation.getCurrentPosition(
                 function (position) {
-                    if ((new Date().getTime() / 1000 / 60 - this.timeOfLastLocation.getTime() / 1000 / 60) > 30) {
+                    var toMinutes = 1 / 60000;
+                    if ((new Date().getTime() *toMinutes - this.timeOfLastLocation.getTime() *toMinutes) > 30) {
                         this.setLocation(position.coords.latitude, position.coords.longitude);
+                        console.log("NEW WEATHER BECAUSE OF TIME ELAPSED SINCE LAST UPDATE");
                     } else { 
                         if (this.isNewUpdateRequired(position.coords.latitude, position.coords.longitude)) {
                             this.setLocation(position.coords.latitude, position.coords.longitude);
