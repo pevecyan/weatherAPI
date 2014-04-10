@@ -30,6 +30,14 @@ div.backgroundUp{
     padding-top:100px;
     border-bottom:solid gray 1px;
 }
+div.docRibbon{
+    background-image:url('ribbon.png');
+    height:108px;
+    width:35px;
+    position:absolute;
+    margin-top:-102px;
+    margin-left:25px;
+}
 div.widgetContainer{
    
 	height: 290px;

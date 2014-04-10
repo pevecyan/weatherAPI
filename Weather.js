@@ -181,6 +181,7 @@ Weather.prototype = {
     /*OTHER*/
     /**
      * Returns temperature in celsius converted from fahreheits
+
      * @param {number} tempFahrenheit - Temperature in fahreheits
      * @returns {number}
      */
@@ -190,8 +191,9 @@ Weather.prototype = {
 
     /**
      * Returns custom value from weather api, documentation here: https://developer.forecast.io/docs/v2 (FLAGS and HOURLY are disabled, for data saving)
+     * @example <caption> Returns current temperature </caption>
+     * weather.getOtherValue("currently", "temperature");
      * @param {...string} [arguments] - Arguments
-
      */
 	getOtherValue: function () {
 	    var value = this.data;
