@@ -112,12 +112,12 @@ Location.prototype = {
             if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
                 var data = JSON.parse(xmlhttp.responseText);
                 //alert(data);
-                if (this.isNewUpdateRequired(data.latitude, data.longitude)) {
-                    this.setLocation(data.latitude, data.longitude);
+                if (this.isNewUpdateRequired(data.lat, data.lon)) {
+                    this.setLocation(data.lat, data.lon);
                 }
             }
         }.bind(this);
-        xmlhttp.open("GET", "http://freegeoip.net/json/", true);
+        xmlhttp.open("GET", "http://ip-api.com/json/", true);
         xmlhttp.send();
     },
 
